@@ -135,3 +135,5 @@ dmypy.json
 
 /data
 /lightning_logs
+/logs
+/logs_tb

@@ -1,7 +1,8 @@
 """Module with training code"""
 
-from typing import Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
+import numpy as np
 import pytorch_lightning as pl
 import torch
 import torchmetrics
@@ -74,11 +75,29 @@ class EyeBlinkModel(pl.LightningModule):
         f1_value = self.f1_metric(result, label)
         accuracy_value = self.accuracy_metric(result, label)
 
-        self.log(name='train_loss', value=loss, prog_bar=True)
-        self.log(name='train_f1', value=f1_value, prog_bar=True)
-        self.log(name='train_accuracy', value=accuracy_value, prog_bar=True)
+        self.log(
+            name='train_loss',
+            value=loss,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='train_f1',
+            value=f1_value,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='train_accuracy',
+            value=accuracy_value,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
 
-        result = {'loss': loss}
+        result = {'loss': loss, 'f1': f1_value, 'accuracy': accuracy_value}
 
         return result
 
@@ -96,11 +115,29 @@ class EyeBlinkModel(pl.LightningModule):
         f1_value = self.f1_metric(result, label)
         accuracy_value = self.accuracy_metric(result, label)
 
-        self.log(name='val_loss', value=loss, prog_bar=True)
-        self.log(name='val_f1', value=f1_value, prog_bar=True)
-        self.log(name='val_accuracy', value=accuracy_value, prog_bar=True)
+        self.log(
+            name='val_loss',
+            value=loss,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='val_f1',
+            value=f1_value,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='val_accuracy',
+            value=accuracy_value,
+            on_step=True,
+            prog_bar=True,
+            logger=True,
+        )
 
-        result = {'loss': loss}
+        result = {'loss': loss, 'f1': f1_value, 'accuracy': accuracy_value}
 
         return result
 
@@ -120,14 +157,44 @@ class EyeBlinkModel(pl.LightningModule):
         return result
 
     def training_epoch_end(
-        self, outputs: Dict[str, torch.Tensor]
+        self, outputs: List[Dict[str, torch.Tensor]]
     ) -> None:  # pylint: disable=R0201
-        pass
+        avg_f1, avg_accuracy = self.__get_avg_metrics(metrics=outputs)
+
+        self.log(
+            name='train_avg_f1',
+            value=avg_f1,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='train_avg_accuracy',
+            value=avg_accuracy,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
 
     def validation_epoch_end(
-        self, outputs: Dict[str, torch.Tensor]
-    ) -> float:  # pylint: disable=R0201
-        pass
+        self, outputs: List[Dict[str, torch.Tensor]]
+    ) -> None:  # pylint: disable=R0201
+        avg_f1, avg_accuracy = self.__get_avg_metrics(metrics=outputs)
+
+        self.log(
+            name='val_avg_f1',
+            value=avg_f1,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            name='val_avg_accuracy',
+            value=avg_accuracy,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
 
     def train_dataloader(self) -> DataLoader:
         train_dataloader = create_data_loader(
@@ -162,3 +229,19 @@ class EyeBlinkModel(pl.LightningModule):
         }
 
         return configuration
+
+    @staticmethod
+    def __get_avg_metrics(
+        metrics: List[Dict[str, torch.Tensor]]
+    ) -> Tuple[float, float]:
+        all_f1_values = [
+            curr_item['f1'].detach().cpu().numpy() for curr_item in metrics
+        ]
+        all_accuracy_values = [
+            curr_item['accuracy'].detach().cpu().numpy() for curr_item in metrics
+        ]
+
+        avg_f1 = np.average(all_f1_values).item()
+        avg_accuracy = np.average(all_accuracy_values).item()
+
+        return avg_f1, avg_accuracy

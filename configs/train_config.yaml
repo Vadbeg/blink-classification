@@ -1,6 +1,10 @@
 seed_everything: null
 trainer:
-  logger: true
+  logger:
+    - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      init_args:
+        save_dir: logs_tb
+        name: "eye_blinking"
   checkpoint_callback: true
   callbacks:
     - class_path: pytorch_lightning.callbacks.EarlyStopping
@@ -10,7 +14,7 @@ trainer:
         min_delta: 0.0
         verbose: true
     - class_path: pytorch_lightning.callbacks.LearningRateMonitor
-  default_root_dir: null
+  default_root_dir: logs
   gradient_clip_val: 0.0
   gradient_clip_algorithm: norm
   process_position: 0
