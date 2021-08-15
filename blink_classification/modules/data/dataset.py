@@ -27,7 +27,7 @@ class BlinkDataset(Dataset):
         self.image_size = image_size
         self.transforms = transforms
 
-    def __getitem__(self, idx: int) -> Dict[str, Union[np.ndarray, int]]:
+    def __getitem__(self, idx: int) -> Dict[str, Union[torch.Tensor, int]]:
         curr_image_path = self.list_of_paths[idx]
 
         image: np.ndarray = cv2.imread(filename=curr_image_path)

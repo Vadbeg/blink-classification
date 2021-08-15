@@ -4,7 +4,7 @@ import torch
 import torchsummary
 
 
-class FaceNet(torch.nn.Module):
+class BlinkNet(torch.nn.Module):
     """Neural network class"""
 
     def __init__(
@@ -84,7 +84,7 @@ class FaceNet(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    network = FaceNet(model_type='simple', in_channels=3, num_of_output_nodes=2).to(
+    network = BlinkNet(model_type='simple', in_channels=3, num_of_output_nodes=2).to(
         'cpu'
     )
 
