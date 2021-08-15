@@ -14,6 +14,9 @@ trainer:
         min_delta: 0.0
         verbose: true
     - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        monitor: val_loss
   default_root_dir: logs
   gradient_clip_val: 0.0
   gradient_clip_algorithm: norm
@@ -75,7 +78,7 @@ model:
   - 128
   - 128
   valid_percent: 0.3
-  in_channels: 3
+  in_channels: 1
   num_of_output_nodes: 2
   model_type: simple
   train_batch_size: 1024

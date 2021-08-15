@@ -16,14 +16,8 @@ def get_args():
     parser.add_argument(
         '--checkpoint-path',
         type=str,
-        default='checkpoints/best_checkpoint.ckpt',
+        default='checkpoints/epoch=53-step=3185.ckpt',
         help='Path to pytorch_lightning checkpoint',
-    )
-    parser.add_argument(
-        '--config-path',
-        type=str,
-        default='configs/train_config.yaml',
-        help='Path to training config. Is used for getting model characteristics',
     )
     parser.add_argument(
         '--device-type',
@@ -44,11 +38,10 @@ def start_eval():
     folder_path = cli_args.folder_path
 
     checkpoint_path = cli_args.checkpoint_path
-    config_path = cli_args.config_path
     device_type = cli_args.device_type
 
     model = EyeBlinkModel.load_from_checkpoint(
-        checkpoint_path=checkpoint_path, hparams_file=config_path, evaluation=True
+        checkpoint_path=checkpoint_path, evaluation=True, data_foder=None
     )
     model.eval()
     model.to(torch.device(device_type))

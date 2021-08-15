@@ -33,7 +33,7 @@ class BlinkDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, Union[torch.Tensor, int]]:
         curr_image_path = self.list_of_paths[idx]
 
-        image: np.ndarray = cv2.imread(filename=curr_image_path)
+        image: np.ndarray = self.__load_and_preprocess_image(image_path=curr_image_path)
 
         eye_state: int = -1
         if not self.is_eval:
@@ -73,6 +73,14 @@ class BlinkDataset(Dataset):
             )
 
         return eye_state_number
+
+    def __load_and_preprocess_image(self, image_path: str) -> np.ndarray:
+        image: np.ndarray = cv2.imread(filename=image_path)
+        image = self.__resize_image(image=image, image_size=self.image_size)
+
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+        return image
 
     @staticmethod
     def __to_tensor(image: np.ndarray) -> torch.Tensor:

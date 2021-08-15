@@ -56,10 +56,6 @@ class EyeBlinkModel(pl.LightningModule):
                 image_size=image_size,
                 valid_percent=valid_percent,
             )
-        elif data_folder and evaluation:
-            raise ValueError(
-                'Model is in evaluation mode, but data_folder was provided!'
-            )
         elif not data_folder and not evaluation:
             raise ValueError('Provide data_folder or set evaluation to True')
 
@@ -175,14 +171,12 @@ class EyeBlinkModel(pl.LightningModule):
             name='train_avg_f1',
             value=avg_f1,
             on_epoch=True,
-            prog_bar=True,
             logger=True,
         )
         self.log(
             name='train_avg_accuracy',
             value=avg_accuracy,
             on_epoch=True,
-            prog_bar=True,
             logger=True,
         )
 
@@ -195,14 +189,12 @@ class EyeBlinkModel(pl.LightningModule):
             name='val_avg_f1',
             value=avg_f1,
             on_epoch=True,
-            prog_bar=True,
             logger=True,
         )
         self.log(
             name='val_avg_accuracy',
             value=avg_accuracy,
             on_epoch=True,
-            prog_bar=True,
             logger=True,
         )
 
