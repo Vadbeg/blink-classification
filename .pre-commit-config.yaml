@@ -4,6 +4,7 @@ repos:
   rev: 20.8b1
   hooks:
     - id: black
+      args: [ --skip-string-normalization ]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:
@@ -14,7 +15,6 @@ repos:
     - id: debug-statements
     - id: end-of-file-fixer
     - id: trailing-whitespace
-    - id: flake8
     - id: requirements-txt-fixer
 - repo: https://github.com/pre-commit/pygrep-hooks
   rev: v1.5.1
