@@ -1,7 +1,6 @@
 """Module with dataset code"""
 
 
-import glob
 import os
 from typing import Dict, List, Tuple, Union
 
@@ -18,12 +17,12 @@ class BlinkDataset(Dataset):
 
     def __init__(
         self,
-        data_folder: str,
+        list_of_paths: List[str],
         image_size: Tuple[int, int] = (128, 128),
         transforms: Compose = None,
     ) -> None:
 
-        self.list_of_paths = self.__get_list_of_paths(data_folder=data_folder)
+        self.list_of_paths = list_of_paths
 
         self.image_size = image_size
         self.transforms = transforms
@@ -34,10 +33,11 @@ class BlinkDataset(Dataset):
         image: np.ndarray = cv2.imread(filename=curr_image_path)
         eye_state: int = self.__get_eye_state(image_path=curr_image_path)
 
+        image = self.__resize_image(image=image, image_size=self.image_size)
+
         if self.transforms:
             image_tensor: torch.Tensor = self.transforms(image=image)['image']
         else:
-            image = self.__resize_image(image=image, image_size=self.image_size)
             image_tensor = self.__to_tensor(image=image)
 
         dataset_item = {'image': image_tensor, 'label': eye_state}
@@ -75,12 +75,3 @@ class BlinkDataset(Dataset):
         image = cv2.resize(src=image, dsize=image_size)
 
         return image
-
-    @staticmethod
-    def __get_list_of_paths(data_folder: str) -> List[str]:
-        image_file_template: str = '**/*.png'
-        image_path_template = os.path.join(data_folder, image_file_template)
-
-        list_of_paths = glob.glob(pathname=image_path_template, recursive=True)
-
-        return list_of_paths
