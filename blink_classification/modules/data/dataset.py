@@ -20,6 +20,7 @@ class BlinkDataset(Dataset):
         list_of_paths: List[str],
         image_size: Tuple[int, int] = (128, 128),
         transforms: Compose = None,
+        is_eval: bool = False,
     ) -> None:
 
         self.list_of_paths = list_of_paths
@@ -27,11 +28,16 @@ class BlinkDataset(Dataset):
         self.image_size = image_size
         self.transforms = transforms
 
+        self.is_eval = is_eval
+
     def __getitem__(self, idx: int) -> Dict[str, Union[torch.Tensor, int]]:
         curr_image_path = self.list_of_paths[idx]
 
         image: np.ndarray = cv2.imread(filename=curr_image_path)
-        eye_state: int = self.__get_eye_state(image_path=curr_image_path)
+
+        eye_state: int = -1
+        if not self.is_eval:
+            eye_state = self.__get_eye_state(image_path=curr_image_path)
 
         image = self.__resize_image(image=image, image_size=self.image_size)
 
@@ -51,7 +57,12 @@ class BlinkDataset(Dataset):
 
     def __get_eye_state(self, image_path: str) -> int:
         image_filename = image_path.split(os.sep)[-1]
-        eye_state: str = image_filename.split("_")[self.EYE_STATE_IDX]
+        image_params: List[str] = image_filename.split("_")
+
+        if len(image_params) <= self.EYE_STATE_IDX:
+            raise IndexError(f'No params in filename: {image_filename}')
+
+        eye_state: str = image_params[self.EYE_STATE_IDX]
 
         try:
             eye_state_number: int = int(eye_state)

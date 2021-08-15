@@ -66,8 +66,9 @@ def split_list_of_paths(
     return train_list_of_paths, val_list_of_paths
 
 
-def get_list_of_paths(data_folder: str) -> List[str]:
-    image_file_template: str = '**/*.png'
+def get_list_of_paths(
+    data_folder: str, image_file_template: str = '**/*.png'
+) -> List[str]:
     image_path_template = os.path.join(data_folder, image_file_template)
 
     list_of_paths = glob.glob(pathname=image_path_template, recursive=True)

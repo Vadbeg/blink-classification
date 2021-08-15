@@ -1,6 +1,6 @@
 """Module with training code"""
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pytorch_lightning as pl
@@ -18,16 +18,17 @@ from blink_classification.modules.models.network import BlinkNet
 class EyeBlinkModel(pl.LightningModule):
     def __init__(
         self,
-        data_folder: str,
+        data_folder: Optional[str] = None,
         image_size: Tuple[int, int] = (128, 128),
         valid_percent: float = 0.3,
         in_channels: int = 3,
         num_of_output_nodes: int = 2,
-        model_type: str = 'resnet18',
+        model_type: str = 'simple',
         train_batch_size: int = 16,
         val_batch_size: int = 16,
         learning_rate: float = 0.001,
         num_workers: int = 6,
+        evaluation: bool = False,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -49,9 +50,18 @@ class EyeBlinkModel(pl.LightningModule):
         self.f1_metric = torchmetrics.F1(num_classes=2)
         self.accuracy_metric = torchmetrics.Accuracy(num_classes=2)
 
-        self.train_dataset, self.val_dataset = get_train_val_datasets(
-            data_folder=data_folder, image_size=image_size, valid_percent=valid_percent
-        )
+        if data_folder and not evaluation:
+            self.train_dataset, self.val_dataset = get_train_val_datasets(
+                data_folder=data_folder,
+                image_size=image_size,
+                valid_percent=valid_percent,
+            )
+        elif data_folder and evaluation:
+            raise ValueError(
+                'Model is in evaluation mode, but data_folder was provided!'
+            )
+        elif not data_folder and not evaluation:
+            raise ValueError('Provide data_folder or set evaluation to True')
 
     def forward(
         self,
