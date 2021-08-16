@@ -27,7 +27,6 @@ def get_train_transforms() -> Compose:
 
 def get_val_transforms() -> Compose:
     transforms = [
-        ToGray(),
         Normalize(mean=0, std=1, always_apply=True),
         ToTensorV2(always_apply=True),
     ]

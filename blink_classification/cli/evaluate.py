@@ -16,7 +16,7 @@ def get_args():
     parser.add_argument(
         '--checkpoint-path',
         type=str,
-        default='checkpoints/epoch=53-step=3185.ckpt',
+        default='checkpoints/best_checkpoint.ckpt',
         help='Path to pytorch_lightning checkpoint',
     )
     parser.add_argument(

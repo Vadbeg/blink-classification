@@ -78,9 +78,21 @@ class BlinkDataset(Dataset):
         image: np.ndarray = cv2.imread(filename=image_path)
         image = self.__resize_image(image=image, image_size=self.image_size)
 
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        if not self.__check_if_already_gray(image=image):
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
         return image
+
+    @staticmethod
+    def __check_if_already_gray(image: np.ndarray) -> bool:
+        is_gray = False
+
+        if len(image.shape) < 3:
+            is_gray = True
+        elif len(image.shape) == 3 and image.shape[-1] == 1:
+            is_gray = True
+
+        return is_gray
 
     @staticmethod
     def __to_tensor(image: np.ndarray) -> torch.Tensor:
